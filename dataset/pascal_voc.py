@@ -203,6 +203,8 @@ class pascal_voc(imdb):
         for i, cls in enumerate(self._classes):
             if cls == '__background__':
                 continue
+            if cls != 'face':
+                continue
             filename = self._get_voc_results_file_template().format(cls)
             rec, prec, ap = voc_eval(
                 filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
