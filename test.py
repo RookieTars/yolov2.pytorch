@@ -154,7 +154,8 @@ def test():
                     im2show = draw_detection_boxes(img, det_boxes, det_classes, class_names=val_imdb.classes)
                     plt.figure()
                     plt.imshow(im2show)
-                    plt.show()
+                    plt.savefig('output/test/{}.jpg'.format(img_id))
+                    plt.close()
 
     with open(det_file, 'wb') as f:
         pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
