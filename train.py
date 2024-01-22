@@ -9,9 +9,11 @@ import argparse
 import time
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
 
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
+from sklearn.model_selection import learning_curve
 from dataset.factory import get_imdb
 from dataset.roidb import RoiDataset, detection_collate
 from yolov2 import Yolov2
@@ -127,6 +129,7 @@ def train():
     tic = time.time()
     model = Yolov2(weights_file=args.pretrained_model)
     toc = time.time()
+    print("model detect {} class(es)".format(Yolov2.num_classes))
     print('model loaded: cost time {:.2f}s'.format(toc-tic))
 
     # initialize the optimizer
@@ -157,8 +160,14 @@ def train():
 
     iters_per_epoch = int(len(train_dataset) / args.batch_size)
 
+    loss_epochs = []
+    iou_loss_epochs = []
+    box_loss_epochs = []
     # start training
     for epoch in range(args.start_epoch, args.max_epochs+1):
+        loss_epoch = 0
+        iou_loss_epoch = 0
+        box_loss_epoch = 0
         loss_temp = 0
         tic = time.time()
         train_data_iter = iter(train_dataloader)
@@ -198,6 +207,9 @@ def train():
             loss.backward()
             optimizer.step()
 
+            loss_epoch += loss.item()
+            iou_loss_epoch += iou_loss.mean().item()
+            box_loss_epoch += box_loss.mean().item()
             loss_temp += loss.item()
 
             if (step + 1) % args.display_interval == 0:
@@ -223,7 +235,41 @@ def train():
 
                 loss_temp = 0
                 tic = time.time()
+        
+        loss_epoch /= iters_per_epoch
+        iou_loss_epoch /= iters_per_epoch
+        box_loss_epoch /= iters_per_epoch
+        loss_epochs.append(loss_epoch)
+        iou_loss_epochs.append(iou_loss_epoch)
+        box_loss_epochs.append(box_loss_epoch)
+        
+        # create a loss-epoch curve plot
+        plt.figure()
+        plt.plot(range(args.start_epoch, epoch+1), loss_epochs)
+        plt.xlabel('epoch')
+        plt.ylabel('loss')
+        plt.title('loss-epoch curve')
+        plt.savefig(os.path.join(output_dir, 'loss_epoch_curve.png'))
+        plt.close()
 
+        # create a iou_loss-epoch curve plot
+        plt.figure()
+        plt.plot(range(args.start_epoch, epoch+1), iou_loss_epochs)
+        plt.xlabel('epoch')
+        plt.ylabel('iou_loss')
+        plt.title('iou_loss-epoch curve')
+        plt.savefig(os.path.join(output_dir, 'iou_loss_epoch_curve.png'))
+        plt.close()
+
+        # create a box_loss-epoch curve plot
+        plt.figure()
+        plt.plot(range(args.start_epoch, epoch+1), box_loss_epochs)
+        plt.xlabel('epoch')
+        plt.ylabel('box_loss')
+        plt.title('box_loss-epoch curve')
+        plt.savefig(os.path.join(output_dir, 'box_loss_epoch_curve.png'))
+        plt.close()
+        
         if epoch % args.save_interval == 0:
             save_name = os.path.join(output_dir, 'yolov2_epoch_{}.pth'.format(epoch))
             torch.save({
@@ -234,12 +280,3 @@ def train():
 
 if __name__ == '__main__':
     train()
-
-
-
-
-
-
-
-
-

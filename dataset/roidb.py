@@ -14,7 +14,8 @@ from util.augmentation import augment_img
 
 
 class RoiDataset(Dataset):
-    def __init__(self, imdb, train=True):
+    def __init__(self, imdb, train=True): 
+        # imdb is a object of pascal_voc class
         super(RoiDataset, self).__init__()
         self._imdb = imdb
         self._roidb = imdb.roidb

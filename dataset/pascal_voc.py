@@ -26,11 +26,8 @@ class pascal_voc(imdb):
         self._image_set = image_set
         self._devkit_path = self._get_default_path()
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
-        self._classes = ('aeroplane', 'bicycle', 'bird', 'boat',
-                         'bottle', 'bus', 'car', 'cat', 'chair',
-                         'cow', 'diningtable', 'dog', 'horse',
-                         'motorbike', 'person', 'pottedplant',
-                         'sheep', 'sofa', 'train', 'tvmonitor')
+        self._classes = ("face", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+                         "11", "12", "13", "14", "15", "16", "17", "18", "19", "20")
         self._class_to_ind = dict(zip(self.classes, range(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -41,7 +38,7 @@ class pascal_voc(imdb):
         # PASCAL specific config options
         self.config = {'cleanup': False,
                        'use_salt': True,
-                       'use_diff': False,
+                       'use_diff': False, # Exclude the samples labeled as difficult
                        'matlab_eval': False,
                        'rpn_file': None,
                        'min_size': 2}
@@ -76,6 +73,7 @@ class pascal_voc(imdb):
     def _get_default_path(self):
         """
         Return the default path where PASCAL VOC is expected to be installed.
+        Default to: data/VOCdevkit{self._year}
         """
         return os.path.join(data_dir, 'VOCdevkit' + self._year)
 
@@ -211,6 +209,7 @@ class pascal_voc(imdb):
                 use_07_metric=use_07_metric)
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
+            print("prec for {}: len = {}, mean = {}".format(cls, len(prec), np.mean(prec)))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
                 pickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
         print('Mean AP = {:.4f}'.format(np.mean(aps)))

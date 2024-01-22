@@ -110,7 +110,7 @@ def voc_eval(detpath,
 
   if not os.path.isfile(cachefile):
     # load annotations
-    recs = {}
+    recs = {} # ground truth with key: imagename, value: list of objects(faces)
     for i, imagename in enumerate(imagenames):
       recs[imagename] = parse_rec(annopath.format(imagename))
       if i % 100 == 0:
@@ -130,16 +130,16 @@ def voc_eval(detpath,
 
   # extract gt objects for this class
   class_recs = {}
-  npos = 0
+  npos = 0 # number of non-difficult faces in ground truth
   for imagename in imagenames:
-    R = [obj for obj in recs[imagename] if obj['name'] == classname]
-    bbox = np.array([x['bbox'] for x in R])
-    difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-    det = [False] * len(R)
+    R = [obj for obj in recs[imagename] if obj['name'] == classname] # list of objects(faces) in imagename file
+    bbox = np.array([x['bbox'] for x in R]) # list of all bounding boxes of faces in imagename file
+    difficult = np.array([x['difficult'] for x in R]).astype(np.bool_)
+    det = [False] * len(R) # list of False with length of number of faces in imagename file
     npos = npos + sum(~difficult)
     class_recs[imagename] = {'bbox': bbox,
                              'difficult': difficult,
-                             'det': det}
+                             'det': det} 
 
   # read dets
   detfile = detpath.format(classname)
@@ -151,7 +151,7 @@ def voc_eval(detpath,
   confidence = np.array([float(x[1]) for x in splitlines])
   BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
 
-  nd = len(image_ids)
+  nd = len(image_ids) # number of detected objects(faces)
   tp = np.zeros(nd)
   fp = np.zeros(nd)
 
@@ -202,6 +202,21 @@ def voc_eval(detpath,
   # compute precision recall
   fp = np.cumsum(fp)
   tp = np.cumsum(tp)
+  print('fp: ', fp)
+  print('tp: ', tp)
+  num_fp = fp[-1]
+  num_tp = tp[-1]
+  pricision = num_tp / np.maximum(nd, np.finfo(np.float64).eps)
+  recall = num_tp / float(npos)
+  accuracy = num_tp / (num_fp + npos)
+  print('num_fp: ', num_fp)
+  print('num_tp: ', num_tp)
+  print('num_fp + num_tp: ', nd)
+  print('num_tp + num_fn: ', npos)
+  print('num_tp + num_tn + num_fp + num_fn: ', num_fp + npos)
+  print('accuracy: ', accuracy)
+  print('precision: ', pricision)
+  print('recall: ', recall)
   rec = tp / float(npos)
   # avoid divide by zero in case the first detection matches a difficult
   # ground truth

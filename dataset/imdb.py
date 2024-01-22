@@ -51,6 +51,8 @@ class imdb(object):
 
     @property
     def roidb(self):
+        # if roidb is not None, return it
+        # otherwise, call roidb_handler() to get roidb
         if self._roidb is not None:
             return self._roidb
         self._roidb = self.roidb_handler()

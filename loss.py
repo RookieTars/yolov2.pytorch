@@ -189,11 +189,11 @@ def yolo_loss(output, target):
     loss -- yolo overall multi-task loss
     """
 
-    delta_pred_batch = output[0]
-    conf_pred_batch = output[1]
+    delta_pred_batch = output[0] # 预测 检测框偏移量
+    conf_pred_batch = output[1] # 预测 检测框iou分数
     class_score_batch = output[2]
 
-    iou_target = target[0]
+    iou_target = target[0] # 真实 检测框偏移量
     iou_mask = target[1]
     box_target = target[2]
     box_mask = target[3]
@@ -206,9 +206,9 @@ def yolo_loss(output, target):
     class_mask = class_mask.view(-1)
 
     # ignore the gradient of noobject's target
-    class_keep = class_mask.nonzero().squeeze(1)
+    class_keep = class_mask.nonzero().squeeze(1) # 包含物体的框索引 shape: (N, )
     class_score_batch_keep = class_score_batch[class_keep, :]
-    class_target_keep = class_target[class_keep]
+    class_target_keep = class_target[class_keep] # 包含物体的框对应的类别 shape: (N, )
 
     # if cfg.debug:
     #     print(class_score_batch_keep)

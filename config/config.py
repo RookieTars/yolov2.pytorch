@@ -18,8 +18,8 @@ batch_size = 16
 lr = 0.0001
 
 decay_lrs = {
-    60: 0.00001,
-    90: 0.000001
+    61: 0.00001,
+    161: 0.000001
 }
 
 momentum = 0.9
@@ -28,7 +28,7 @@ weight_decay = 0.0005
 
 # multi-scale training:
 # {k: epoch, v: scale range}
-multi_scale = True
+multi_scale = False
 
 # number of steps to change input size
 scale_step = 40

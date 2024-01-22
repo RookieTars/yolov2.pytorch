@@ -18,6 +18,7 @@ from config import config as cfg
 
 
 def parse_args():
+    # python test.py --dataset voc07test --model_name yolov2_epoch_160 --cuda True
 
     parser = argparse.ArgumentParser('Yolo v2')
     parser.add_argument('--dataset', dest='dataset',
