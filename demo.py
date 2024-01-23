@@ -41,17 +41,17 @@ def demo():
                          'sheep', 'sofa', 'train', 'tvmonitor')
 
     model = Yolov2()
-    weight_loader = WeightLoader()
-    weight_loader.load(model, 'yolo-voc.weights')
-    print('loaded')
+    # weight_loader = WeightLoader()
+    # weight_loader.load(model, 'yolo-voc.weights')
+    # print('loaded')
 
-    # model_path = os.path.join(args.output_dir, args.model_name + '.pth')
-    # print('loading model from {}'.format(model_path))
-    # if torch.cuda.is_available():
-    #     checkpoint = torch.load(model_path)
-    # else:
-    #     checkpoint = torch.load(model_path, map_location='cpu')
-    # model.load_state_dict(checkpoint['model'])
+    model_path = os.path.join(args.output_dir, args.model_name + '.pth')
+    print('loading model from {}'.format(model_path))
+    if torch.cuda.is_available():
+        checkpoint = torch.load(model_path)
+    else:
+        checkpoint = torch.load(model_path, map_location='cpu')
+    model.load_state_dict(checkpoint['model'])
 
     if args.use_cuda:
         model.cuda()
@@ -85,7 +85,9 @@ def demo():
         im2show = draw_detection_boxes(img, det_boxes, det_classes, class_names=classes)
         plt.figure()
         plt.imshow(im2show)
+        plt.savefig(os.path.join(images_dir, "result" + image_name))
         plt.show()
+        plt.close()
 
 if __name__ == '__main__':
     demo()
