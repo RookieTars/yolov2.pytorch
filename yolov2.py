@@ -38,7 +38,7 @@ class ReorgLayer(nn.Module):
 
 class Yolov2(nn.Module):
 
-    num_classes = 20
+    num_classes = 1
     num_anchors = 5
 
     def __init__(self, classes=None, weights_file=False):
@@ -96,6 +96,7 @@ class Yolov2(nn.Module):
         # `sigmoid` for t_x, t_y, t_c; `exp` for t_h, t_w;
         # `softmax` for (class1_score, class2_score, ...)
 
+        print('out size: ', out.shape)
         xy_pred = torch.sigmoid(out[:, :, 0:2])
         conf_pred = torch.sigmoid(out[:, :, 4:5])
         hw_pred = torch.exp(out[:, :, 2:4])

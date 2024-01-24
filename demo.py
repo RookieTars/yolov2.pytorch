@@ -34,11 +34,7 @@ def demo():
     images_dir = 'images'
     images_names = ['image1.jpg', 'image2.jpg']
 
-    classes = ('aeroplane', 'bicycle', 'bird', 'boat',
-                         'bottle', 'bus', 'car', 'cat', 'chair',
-                         'cow', 'diningtable', 'dog', 'horse',
-                         'motorbike', 'person', 'pottedplant',
-                         'sheep', 'sofa', 'train', 'tvmonitor')
+    classes = ('face',)
 
     model = Yolov2()
     # weight_loader = WeightLoader()
@@ -72,6 +68,10 @@ def demo():
         tic = time.time()
 
         yolo_output = model(im_data_variable)
+        # len_yolo_output = len(yolo_output)
+        # print("yolo_output len: ", len_yolo_output)
+        # for i in range(len_yolo_output):
+        #     print("yolo_output[{}] shape: {}".format(i, yolo_output[0].data.shape))
         yolo_output = [item[0].data for item in yolo_output]
         detections = yolo_eval(yolo_output, im_info, conf_threshold=0.6, nms_threshold=0.4)
 
